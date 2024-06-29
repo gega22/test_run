@@ -9,8 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to move barriers automatically
     function moveBarriers() {
-        let barrier1Left = 500; // Initial position of barrier1
-        let barrier2Left = 1000; // Initial position of barrier2
+        let barrier1Left = 1000; // Initial position of barrier1, start further to the right
+        let barrier2Left = 1500; // Initial position of barrier2, start even further to the right
+        let barrierGap = 400; // Initial gap between barriers
 
         let moveInterval = setInterval(function() {
             barrier1Left -= 2; // Adjust speed as needed
@@ -19,23 +20,23 @@ document.addEventListener('DOMContentLoaded', function() {
             barrier1.style.left = barrier1Left + 'px';
             barrier2.style.left = barrier2Left + 'px';
 
-            // Reset barriers when they move out of view
+            // Reset barriers when they move out of view and ensure minimum gap between them
             if (barrier1Left <= -80) {
-                barrier1Left = 800;
+                barrier1Left = Math.max(barrier1Left, barrier2Left + barrierGap + Math.random() * 100); // Reset barrier1 to a position after barrier2
                 barrier1.style.left = barrier1Left + 'px';
             }
 
             if (barrier2Left <= -80) {
-                barrier2Left = 800;
+                barrier2Left = Math.max(barrier2Left, barrier1Left + barrierGap + Math.random() * 100); // Reset barrier2 to a position after barrier1
                 barrier2.style.left = barrier2Left + 'px';
             }
 
             // Check for collision with barriers
             if (checkCollision(character, barrier1) || checkCollision(character, barrier2)) {
                 clearInterval(moveInterval); // Stop moving barriers
-                alert('წააგე ბრატ!'); // Replace with game over logic
+                alert('Game Over!'); // Replace with game over logic
             }
-        }, 4);
+        }, 4); // Adjust interval speed as needed
     }
 
     // Start moving barriers
@@ -78,6 +79,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 20);
     }
 
+    // Add event listener for mouse click
+    document.addEventListener('click', function() {
+        jump();
+    });
+
     function checkCollision(char, barrier) {
         let charTop = char.offsetTop;
         let charBottom = charTop + char.offsetHeight;
@@ -95,12 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return false;
     }
-
-    document.addEventListener('keydown', function(event) {
-        if (event.code === 'Space') {
-            jump();
-        }
-    });
 
     function fall() {
         characterBottom -= gravity;
