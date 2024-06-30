@@ -2,10 +2,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const character = document.getElementById('character');
     const barrier1 = document.getElementById('barrier1');
     const barrier2 = document.getElementById('barrier2');
+    const scoreElement = document.getElementById('score');
 
     let characterBottom = 0;
     let gravity = 4;
     let isJumping = false;
+    let score = 0;
+
+    // Function to update score
+    function updateScore() {
+        score++;
+        scoreElement.textContent = 'Score: ' + score;
+    }
+
+    // Function to reset game state
+    function restartGame() {
+        // Reset character position
+        characterBottom = 0;
+        character.style.bottom = characterBottom + 'px';
+
+        // Restart moving barriers
+        moveBarriers();
+
+        // Reset score
+        score = 0;
+        updateScore();
+    }
 
     // Function to move barriers automatically
     function moveBarriers() {
@@ -24,23 +46,26 @@ document.addEventListener('DOMContentLoaded', function() {
             if (barrier1Left <= -80) {
                 barrier1Left = Math.max(barrier1Left, barrier2Left + barrierGap + Math.random() * 100); // Reset barrier1 to a position after barrier2
                 barrier1.style.left = barrier1Left + 'px';
+                updateScore(); // Increment score when barrier1 moves out of view
             }
 
             if (barrier2Left <= -80) {
                 barrier2Left = Math.max(barrier2Left, barrier1Left + barrierGap + Math.random() * 100); // Reset barrier2 to a position after barrier1
                 barrier2.style.left = barrier2Left + 'px';
+                updateScore(); // Increment score when barrier2 moves out of view
             }
 
             // Check for collision with barriers
             if (checkCollision(character, barrier1) || checkCollision(character, barrier2)) {
-                clearInterval(moveInterval); // Stop moving barriers
-                alert('Game Over!'); // Replace with game over logic
+                handleCollision();
             }
         }, 4); // Adjust interval speed as needed
+
+        return moveInterval;
     }
 
     // Start moving barriers
-    moveBarriers();
+    let moveInterval = moveBarriers();
 
     function jump() {
         if (isJumping) return;
@@ -102,6 +127,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
     }
 
+    function handleCollision() {
+        clearInterval(moveInterval); // Stop moving barriers
+        alert('Game Over! Your Score: ' + score); // Replace with desired game over logic
+
+        // Optionally, you can restart the game automatically after collision
+        // restartGame();
+    }
+
     function fall() {
         characterBottom -= gravity;
         character.style.bottom = characterBottom + 'px';
@@ -113,5 +146,5 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimationFrame(fall);
     }
 
-    fall();
+    fall(); // Start the character falling animation
 });
